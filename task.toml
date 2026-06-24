@@ -1,4 +1,4 @@
-artifacts = "/app/out.json"
+artifacts = ["/app/report.json"]
 
 [task]
 name = "dynamo/log-report"
@@ -8,13 +8,13 @@ description = "Parse an Apache-style access log into a small JSON summary report
 category = "data_processing_and_etl"
 subcategory = "text_processing"
 task_objective = ["transform", "generate"]
-artifact_type = ["text_or_log_file", "generated_output_artifact"]
+artifact_type = ["generated_output_artifact"]
 expert_time_estimate_hours = 0.3
 model_tested = "GPT-5.4"
 agent_tested = "Terminus-2"
-difficulty_explanation = "Parse a small access log and emit summary stats."
-solution_explanation = "Read the log, count requests/unique IPs, find the top path."
-verification_explanation = "Check the report file."
+difficulty_explanation = "Parse a small Apache-style access log and emit summary statistics: total request count, distinct client IP count, and the most frequently requested path."
+solution_explanation = "Read /app/access.log line by line; count every non-empty line as a request, collect the first whitespace field as the client IP, and parse the requested path out of the quoted request line. Write total_requests, unique_ips, and the most common path to /app/report.json as JSON."
+verification_explanation = "Build report.json with the oracle, then assert the file exists, is valid JSON, and that total_requests, unique_ips, and top_path equal the values computed from the fixed access.log (6, 3, /index.html). The nop agent produces no report.json, so the existence check fails and reward is 0."
 
 [verifier]
 timeout_sec = 120.0
@@ -28,5 +28,5 @@ cpus = 1
 memory_mb = 2048
 storage_mb = 10240
 gpus = 0
-allow_internet = true
+allow_internet = false
 mcp_servers = []
